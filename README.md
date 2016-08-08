@@ -7,26 +7,32 @@
 Root certificates are used as signing authority.
 
 Generate key:
+
 `openssl genrsa -aes256  -out ca-key.pem 4096`
 
 Sign the key:
+
 `openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -out ca.pem`
 
 
 ###Generating the keys for docker daemon
 
 Generate key:
+
 `openssl genrsa -out server-key.pem 4096`
 
 Generate certificate signing request. Replace IP with your host ip
+
 `openssl req -subj "/CN=$IP" -sha256 -new -key server-key.pem -out server.csr`
 
 Use extension when signing the certificate. Again, replace the $IP
+
 `echo subjectAltName = IP:$IP,IP:127.0.0.1 > extfile.cnf`
 
 Generate the certificate sign it with the certificate authority.
 ```
 openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem \
+
 -CAcreateserial -out server-cert.pem -extfile extfile.cnf
 ```
 
@@ -40,6 +46,7 @@ openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem 
 `echo extendedKeyUsage = clientAuth > extfile.cnf`
 
 `openssl x509 -req -days 365 -sha256 -in client.csr -CA ca.pem -CAkey ca-key.pem \
+
   -CAcreateserial -out cert.pem -extfile extfile.cnf`
 
 
@@ -51,6 +58,7 @@ You can verify if it works. Run daemon with:
 
 ```
 docker daemon --tlsverify --tlscacert=ca.pem --tlscert=server-cert.pem --tlskey=server-key.pem \
+
   -H=0.0.0.0:2376
 ```  
 
@@ -58,6 +66,7 @@ Display docker version:
 
 ```
 docker --tlsverify --tlscacert=ca.pem --tlscert=cert.pem --tlskey=key.pem \
+
   -H=$IP:2376 version
 ```
 
@@ -68,17 +77,21 @@ This is pretty much the same as generating the server keys for api. We will reus
 previously generated certificate authority
 
 Generate key:
+
 `openssl genrsa -out domainkey 4096`
 
 Generate certificate signing request. Replace IP with your host ip
+
 `openssl req -subj "/CN=$IP:5000" -sha256 -new -key domain.key -out domain.csr`
 
 Use extension when signing the certificate. Again, replace the $IP
+
 `echo subjectAltName = IP:$IP,IP:127.0.0.1 > extfile.cnf`
 
 Generate the certificate sign it with the certificate authority.
 ```
 openssl x509 -req -days 365 -sha256 -in dimain.csr -CA ca.pem -CAkey ca-key.pem \
+
 -CAcreateserial -out domain.crt -extfile extfile.cnf
 ```
 
