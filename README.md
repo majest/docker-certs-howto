@@ -32,7 +32,6 @@ Use extension when signing the certificate. Again, replace the $IP
 Generate the certificate sign it with the certificate authority.
 ```
 openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem \
-
 -CAcreateserial -out server-cert.pem -extfile extfile.cnf
 ```
 
@@ -45,9 +44,10 @@ openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem 
 
 `echo extendedKeyUsage = clientAuth > extfile.cnf`
 
-`openssl x509 -req -days 365 -sha256 -in client.csr -CA ca.pem -CAkey ca-key.pem \
-
-  -CAcreateserial -out cert.pem -extfile extfile.cnf`
+```
+openssl x509 -req -days 365 -sha256 -in client.csr -CA ca.pem -CAkey ca-key.pem \
+  -CAcreateserial -out cert.pem -extfile extfile.cnf
+```
 
 
 `chmod -v 0400 ca-key.pem key.pem server-key.pem`
@@ -58,7 +58,6 @@ You can verify if it works. Run daemon with:
 
 ```
 docker daemon --tlsverify --tlscacert=ca.pem --tlscert=server-cert.pem --tlskey=server-key.pem \
-
   -H=0.0.0.0:2376
 ```  
 
@@ -66,7 +65,6 @@ Display docker version:
 
 ```
 docker --tlsverify --tlscacert=ca.pem --tlscert=cert.pem --tlskey=key.pem \
-
   -H=$IP:2376 version
 ```
 
